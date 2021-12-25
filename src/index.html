@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>m3u8</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+          Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        background-color: teal;
+      }
+      .container {
+        display: flex;
+        flex-direction: column;
+        max-width: 600px;
+        margin: 20px auto;
+      }
+      .btn {
+        margin: 4px auto;
+        padding: 8px;
+        border-radius: 7px;
+        outline: none;
+        background: #8baae1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="inputm3u8" contenteditable></div>
+      <button class="btn getsource">ATTACH</button>
+      <button class="btn playmedia">PLAY</button>
+      <video controls></video>
+    </div>
+  </body>
+</html>
