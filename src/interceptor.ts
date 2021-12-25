@@ -49,6 +49,7 @@ class MediaSourceMock extends window.MediaSource {
   addSourceBuffer(mimeType: string): SourceBuffer {
     try {
       const sb = super.addSourceBuffer(mimeType)
+      sb.mode = 'sequence'
       const mediaSource = this
       const objectURL = objURLStore.get(mediaSource)
       objURLStore.delete(mediaSource)
@@ -70,9 +71,9 @@ class MediaSourceMock extends window.MediaSource {
           sb.addEventListener(
             'update',
             function () {
-              mediaEmitter.element.currentTime = sb.timestampOffset - 9 // seek
-              mediaEmitter.chunk(data, sb.timestampOffset) // <= new chunk recieved
-              if (mediaSource.duration - sb.timestampOffset < 1) {
+              mediaEmitter.element.currentTime = mediaEmitter.element.buffered.end(0) - 9
+              mediaEmitter.chunk(data, mediaEmitter.element.buffered.end(0)) // <= new chunk recieved
+              if (mediaSource.duration - mediaEmitter.element.buffered.end(0) < 1) {
                 sb.abort()
                 mediaSource.endOfStream()
                 mediaEmitter.done()
