@@ -35,7 +35,7 @@ function playMedia(tag: HTMLMediaElement, uri: string) {
   })
 }
 
-function savem3u8(uri) {
+function savem3u8(uri: string) {
   const chunks = []
   let mimeType = ''
   let duration = 0
@@ -49,7 +49,7 @@ function savem3u8(uri) {
       console.log('chunk', endDTS / duration)
       chunks.push(data)
     })
-    .on('done', () => saveBlob(chunks, Date.now() + '.mp3', mimeType))
+    .on('done', () => saveBlob(chunks, uri.split('').filter(c => /[\w-\.]/.test(c)).join('') + '.mp4', mimeType))
 }
 
 const getbtn = document.querySelector<HTMLButtonElement>('.getsource')
@@ -57,7 +57,7 @@ const playbtn = document.querySelector<HTMLButtonElement>('.playmedia')
 const parsebtn = document.querySelector<HTMLButtonElement>('.parseplaylist')
 const input = document.querySelector<HTMLDivElement>('.inputm3u8')
 const videotag = document.querySelector<HTMLMediaElement>('video')
-input.innerText = '/media/index.m3u8'
+input.innerText = '/index.m3u8'
 getbtn.onclick = () => {
   savem3u8(input.innerText)
 }
