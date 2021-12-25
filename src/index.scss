@@ -15,10 +15,10 @@ html, body {
 
 body {
   background-color: black;
-  background-image: url('bg.jpg');
+  background-image: url('bg.svg');
   background-position: center;
   background-size: cover;
-  
+  background-attachment: fixed;
 
   font-family: $font-family;
 
@@ -34,22 +34,25 @@ body {
       border: 1px solid white;
       color: $text_white;
       outline: none;
+      overflow: hidden;
+      white-space: nowrap;
 
       margin-bottom: 20px;
     }
 
     > .btn {
       display: block;
-      padding: 20px 20px 20px 60px;
+      padding: 16px 20px 16px 40px;
       border: none;
       background-color: transparent;
       color: $text_white;
       width: 100%;
       text-align: left;
       text-transform: uppercase;
+      outline: none;
 
       font-family: inherit;
-      font-size: 26px;
+      font-size: 24px;
       line-height: 1em;
       letter-spacing: 0.01em;
 
