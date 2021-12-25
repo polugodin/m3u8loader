@@ -55,17 +55,33 @@ function savem3u8(uri: string) {
 const getbtn = document.querySelector<HTMLButtonElement>('.getsource')
 const playbtn = document.querySelector<HTMLButtonElement>('.playmedia')
 const parsebtn = document.querySelector<HTMLButtonElement>('.parseplaylist')
-const input = document.querySelector<HTMLDivElement>('.inputm3u8')
+const inputURI = document.querySelector<HTMLDivElement>('.inputm3u8')
 const videotag = document.querySelector<HTMLMediaElement>('video')
-input.innerText = '/index.m3u8'
+inputURI.innerText = '/index.m3u8'
 getbtn.onclick = () => {
-  savem3u8(input.innerText)
+  savem3u8(inputURI.innerText)
 }
 playbtn.onclick = () => {
-  playMedia(videotag, input.innerText)
+  playMedia(videotag, inputURI.innerText)
 }
 parsebtn.onclick = () => {
-  fetch(input.innerText).then(r => r.text()).then(parse).then(console.log)
+  fetch(inputURI.innerText).then(r => r.text()).then(parse).then(playlistData => {
+    const res = JSON.stringify(playlistData, (key, value) => {
+      if (key === 'uri' && typeof value === 'string') {
+        console.log(value)
+        return `<a href=${value}>${value}</a>`
+      }
+      return value
+    }, 2)
+    const pre = document.querySelector<HTMLPreElement>('pre.parse-result')
+    pre.innerHTML = res
+    pre.querySelectorAll('a').forEach(a => {
+      a.onclick = event => {
+        event.preventDefault()
+        inputURI.innerText = a.href
+      }
+    })
+  })
 }
 
 function saveBlob(chunks, fileName, mime) {
