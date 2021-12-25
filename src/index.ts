@@ -1,3 +1,4 @@
+import './index.scss'
 import { mediaElementsStore, MediaEmitter } from './interceptor'
 import Hls from 'hls.js'
 import { parse } from './playlistParser'
