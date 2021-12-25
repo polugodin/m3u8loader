@@ -1,5 +1,6 @@
 import { mediaElementsStore, MediaEmitter } from './interceptor'
 import Hls from 'hls.js'
+import { parse } from './playlistParser'
 
 if (!Hls.isSupported()) {
   throw new Error('Hls not supported')
@@ -7,7 +8,8 @@ if (!Hls.isSupported()) {
 
 const hls = new Hls()
 const download = function (uri) {
-  const mediaElement: HTMLMediaElement = document.createElement('audio')
+  const mediaElement: HTMLMediaElement = document.createElement('video')
+
   mediaElement.muted = true
   const mediaEmitter = new MediaEmitter<HTMLMediaElement>(mediaElement)
   mediaElementsStore.add(mediaEmitter)
@@ -40,6 +42,7 @@ function savem3u8(uri) {
     .on('meta', (_mimeType, _duration) => {
       mimeType = _mimeType
       duration = _duration
+      console.log(_mimeType, _duration)
     })
     .on('chunk', (data, endDTS) => {
       console.log('chunk', endDTS / duration)
@@ -50,6 +53,7 @@ function savem3u8(uri) {
 
 const getbtn = document.querySelector<HTMLButtonElement>('.getsource')
 const playbtn = document.querySelector<HTMLButtonElement>('.playmedia')
+const parsebtn = document.querySelector<HTMLButtonElement>('.parseplaylist')
 const input = document.querySelector<HTMLDivElement>('.inputm3u8')
 const videotag = document.querySelector<HTMLMediaElement>('video')
 input.innerText = '/media/index.m3u8'
@@ -58,6 +62,9 @@ getbtn.onclick = () => {
 }
 playbtn.onclick = () => {
   playMedia(videotag, input.innerText)
+}
+parsebtn.onclick = () => {
+  fetch(input.innerText).then(r => r.text()).then(parse).then(console.log)
 }
 
 function saveBlob(chunks, fileName, mime) {
