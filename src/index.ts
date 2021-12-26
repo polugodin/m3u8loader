@@ -68,8 +68,9 @@ parsebtn.onclick = () => {
   fetch(inputURI.innerText).then(r => r.text()).then(parse).then(playlistData => {
     const res = JSON.stringify(playlistData, (key, value) => {
       if (key === 'uri' && typeof value === 'string') {
-        console.log(value)
-        return `<a href=${value}>${value}</a>`
+        const match = inputURI.innerText.match(/.*\//i)
+        const v = !match || value.startsWith('http') ? value : match[0] + value
+        return `<a href=${v}>${v}</a>`
       }
       return value
     }, 2)
