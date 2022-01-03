@@ -1,39 +1,6 @@
 import './index.scss'
-import { mediaElementsStore, MediaEmitter } from './interceptor'
-import Hls from 'hls.js'
-import { parse } from './playlistParser'
-
-if (!Hls.isSupported()) {
-  throw new Error('Hls not supported')
-}
-
-const hls = new Hls()
-const download = function (uri) {
-  const mediaElement: HTMLMediaElement = document.createElement('video')
-
-  mediaElement.muted = true
-  const mediaEmitter = new MediaEmitter<HTMLMediaElement>(mediaElement)
-  mediaElementsStore.add(mediaEmitter)
-  hls.attachMedia(mediaElement)
-  hls.on(Hls.Events.MEDIA_ATTACHED, function () {
-    hls.loadSource(uri)
-    hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
-      console.log('manifest loaded, found ' + data.levels.length + ' quality level')
-    })
-  })
-  return mediaEmitter
-}
-
-function playMedia(tag: HTMLMediaElement, uri: string) {
-  hls.attachMedia(tag)
-  hls.on(Hls.Events.MEDIA_ATTACHED, function () {
-    hls.loadSource(uri)
-    hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
-      console.log('manifest loaded, found ' + data.levels.length + ' quality level')
-      tag.play()
-    })
-  })
-}
+import { download, playMedia, saveBlob } from './api'
+import { parsem3u8 } from './playlistParser'
 
 function savem3u8(uri: string) {
   const chunks = []
@@ -49,7 +16,16 @@ function savem3u8(uri: string) {
       console.log('chunk', endDTS / duration)
       chunks.push(data)
     })
-    .on('done', () => saveBlob(chunks, uri.split('').filter(c => /[\w-\.]/.test(c)).join('') + '.mp4', mimeType))
+    .on('done', () =>
+      saveBlob(
+        chunks,
+        uri
+          .split('')
+          .filter((c) => /[\w-\.]/.test(c))
+          .join('') + '.mp4',
+        mimeType
+      )
+    )
 }
 
 const getbtn = document.querySelector<HTMLButtonElement>('.getsource')
@@ -65,35 +41,29 @@ playbtn.onclick = () => {
   playMedia(videotag, inputURI.innerText)
 }
 parsebtn.onclick = () => {
-  fetch(inputURI.innerText).then(r => r.text()).then(parse).then(playlistData => {
-    const res = JSON.stringify(playlistData, (key, value) => {
-      if (key === 'uri' && typeof value === 'string') {
-        const match = inputURI.innerText.match(/.*\//i)
-        const v = !match || value.startsWith('http') ? value : match[0] + value
-        return `<a href=${v}>${v}</a>`
-      }
-      return value
-    }, 2)
-    const pre = document.querySelector<HTMLPreElement>('pre.parse-result')
-    pre.innerHTML = res
-    pre.querySelectorAll('a').forEach(a => {
-      a.onclick = event => {
-        event.preventDefault()
-        inputURI.innerText = a.href
-      }
+  fetch(inputURI.innerText)
+    .then((r) => r.text())
+    .then(parsem3u8)
+    .then((playlistData) => {
+      const res = JSON.stringify(
+        playlistData,
+        (key, value) => {
+          if (key === 'uri' && typeof value === 'string') {
+            const match = inputURI.innerText.match(/.*\//i)
+            const v = !match || value.startsWith('http') ? value : match[0] + value
+            return `<a href=${v}>${v}</a>`
+          }
+          return value
+        },
+        2
+      )
+      const pre = document.querySelector<HTMLPreElement>('pre.parse-result')
+      pre.innerHTML = res
+      pre.querySelectorAll('a').forEach((a) => {
+        a.onclick = (event) => {
+          event.preventDefault()
+          inputURI.innerText = a.href
+        }
+      })
     })
-  })
-}
-
-function saveBlob(chunks, fileName, mime) {
-  const blob = new Blob(chunks, { type: mime })
-
-  const objurl = URL.createObjectURL(blob)
-
-  const a = document.createElement('a')
-  a.download = fileName
-  a.href = objurl
-  a.click()
-
-  URL.revokeObjectURL(objurl)
 }

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>M3U8 Player & Downloader</title>
+    <title>M3U8 Player | Downloader</title>
   </head>
   <body>
     <div class="container">
@@ -13,7 +13,38 @@
       <button class="btn getsource">GET</button>
       <button class="btn parseplaylist">PARSE</button>
       <video class="video-player" controls></video>
-      <div style="background: thistle; overflow: hidden;" class="modal"><pre class="parse-result"></pre></div>
+      <div style="background: thistle; overflow: hidden" class="modal">
+        <pre class="parse-result"></pre>
+      </div>
+      <div class="headers">
+        <h1>M3U8 Player | Downloader | Parser</h1>
+        <p>tags decode aes-128 aes online hls playeer music video</p>
+        <pre>
+          window.api = {
+            m3u8: {
+              parse: (playlist: string) => string,
+              download: (uri: string) => MediaEmitter<HTMLMediaElement>,
+              play: (tag: HTMLMediaElement, uri: string) => void,
+            },
+            saveBlob: (chunks: Array<Uint8Array>, fileName: string, mime: string) => void,
+          }
+          ========EXAMPLE=======
+          const chunks = []
+          const mimeType = ''
+          window.api.m3u8.download("https://examle.com/simple.m3u8")
+            .on('meta', (_mimeType, _duration) => {
+              mimeType = _mimeType
+              console.log(_mimeType, _duration)
+            })
+            .on('chunk', (data, endDTS) => {
+              console.log('chunk', endDTS) // endDTS/duration = 'download proggres'
+              chunks.push(data)
+            })
+            .on('done', () => {
+              window.api.saveBlob(chunks, 'a.mp3', mimeType)
+            })
+        </pre>
+      </div>
     </div>
   </body>
 </html>

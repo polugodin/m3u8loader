@@ -62,7 +62,6 @@ class MediaSourceMock extends window.MediaSource {
 
       mediaEmitter.meta(mimeType, mediaSource.duration)
 
-
       sb.appendBuffer = new Proxy(sb.appendBuffer, {
         apply(target, thisArg, args) {
           const data = args[0]
@@ -112,10 +111,5 @@ const URLProxy = {
   }),
 }
 
-const fakeURL = {
-  ...window.URL,
-  ...URLProxy,
-}
-
 window.MediaSource = MediaSourceMock
-Object.assign(window.URL, fakeURL)
+Object.assign(window.URL, URLProxy)
